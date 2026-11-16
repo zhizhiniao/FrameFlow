@@ -12,7 +12,7 @@ internal static class Launcher {
             if (!created) { MessageBox.Show("帧流已经打开，请在任务栏中切换到它。", "帧流"); return 0; }
             try {
                 string root = AppDomain.CurrentDomain.BaseDirectory;
-                foreach (string file in new [] {"VideoDownloader.ps1", "VideoDownloader.UI.ps1", "VideoDownloader.Queue.ps1", "VideoDownloader.Accounts.ps1", "VideoDownloader.xaml", "VideoDownloader.Runtime.cs", "worker\\FrameFlow.Worker.exe", "browser\\chrome.exe", "yt-dlp.exe", "ffmpeg\\bin\\ffmpeg.exe", "ffmpeg\\bin\\ffprobe.exe"}) {
+                foreach (string file in new [] {"VideoDownloader.ps1", "VideoDownloader.UI.ps1", "VideoDownloader.Queue.ps1", "VideoDownloader.Accounts.ps1", "VideoDownloader.Update.ps1", "Update.Check.ps1", "Update.Apply.ps1", "app-version.json", "FrameFlow.ico", "VideoDownloader.xaml", "VideoDownloader.Runtime.cs", "worker\\FrameFlow.Worker.exe", "browser\\chrome.exe", "yt-dlp.exe", "ffmpeg\\bin\\ffmpeg.exe", "ffmpeg\\bin\\ffprobe.exe"}) {
                     if (!File.Exists(Path.Combine(root, file))) throw new Exception("组件不完整，请将压缩包全部解压到一个文件夹后，再打开 FrameFlow.exe。缺少：" + file);
                 }
                 string data = Environment.GetEnvironmentVariable("FRAMEFLOW_DATA_ROOT");

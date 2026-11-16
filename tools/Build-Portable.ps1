@@ -1,7 +1,8 @@
 ﻿param([string]$Destination, [switch]$SkipWorker)
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot -Parent
-if (-not $Destination) { $Destination=Join-Path $project 'release\FrameFlow-Portable-v0.2.4' }
+$buildVersion=(Get-Content -LiteralPath (Join-Path $project 'app-version.json') -Raw | ConvertFrom-Json).version
+if (-not $Destination) { $Destination=Join-Path $project ('release\FrameFlow-Portable-v'+$buildVersion) }
 $dependencyRoot=if(Test-Path -LiteralPath (Join-Path $project 'yt-dlp.exe')){$project}else{Split-Path $project -Parent}
 $python=Join-Path $project '.build-venv\Scripts\python.exe'
 $Destination=[IO.Path]::GetFullPath($Destination)
@@ -17,7 +18,7 @@ foreach ($file in @('vjshi.py','case-player.cjs')) {
   Copy-Item -LiteralPath (Join-Path (Join-Path $dependencyRoot $pluginPath) $file) -Destination $pluginTarget -Force
 }
 # Explicit allowlist. Never recurse across the working project or user's data folders.
-foreach ($file in @('VideoDownloader.ps1','VideoDownloader.UI.ps1','VideoDownloader.Queue.ps1','VideoDownloader.Accounts.ps1','VideoDownloader.Settings.ps1','VideoDownloader.Library.ps1','VideoDownloader.xaml','VideoDownloader.Runtime.cs','yt-dlp.exe','FrameFlow.ico','README.md','便携版-验收记录.md','PORTABLE-使用说明.md','THIRD-PARTY-NOTICES.md')) {
+foreach ($file in @('VideoDownloader.ps1','VideoDownloader.UI.ps1','VideoDownloader.Queue.ps1','VideoDownloader.Accounts.ps1','VideoDownloader.Settings.ps1','VideoDownloader.Library.ps1','VideoDownloader.Update.ps1','Update.Check.ps1','Update.Apply.ps1','app-version.json','LICENSE','VideoDownloader.xaml','VideoDownloader.Runtime.cs','yt-dlp.exe','FrameFlow.ico','README.md','便携版-验收记录.md','PORTABLE-使用说明.md','THIRD-PARTY-NOTICES.md')) {
   $sourceRoot=if($file -eq 'yt-dlp.exe'){$dependencyRoot}else{$project}
   Copy-Item -LiteralPath (Join-Path $sourceRoot $file) -Destination (Join-Path $Destination $file) -Force
 }
@@ -37,5 +38,5 @@ Get-ChildItem -LiteralPath (Join-Path $project 'licenses') -File | Copy-Item -De
   $files = @(Get-ChildItem -LiteralPath $Destination -Recurse -File | Where-Object FullName -NE (Join-Path $Destination 'manifest.json') | ForEach-Object {
   @{path=$_.FullName.Substring($Destination.Length+1).Replace('\','/'); bytes=$_.Length; sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}
 })
-@{version='0.2.4-preview'; target='Windows 10/11 x64'; files=$files} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $Destination 'manifest.json') -Encoding UTF8
+@{version=$buildVersion; target='Windows 10/11 x64'; files=$files} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $Destination 'manifest.json') -Encoding UTF8
 Write-Output ('Portable folder: '+$Destination)

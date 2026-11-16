@@ -10,7 +10,7 @@ Windows 本地视频与图文下载工具。粘贴链接或分享文案，在本
 
 ## 开始使用
 
-1. 从 Releases 下载 `FrameFlow-Portable-v0.3.0-Windows-x64.zip`，完整解压到有写入权限的目录。
+1. 从 Releases 下载最新 `FrameFlow-Portable-v版本号-Windows-x64.zip`，完整解压到有写入权限的目录。
 2. 双击 `FrameFlow.exe`，粘贴视频链接或完整分享文案，点击“开始下载”。
 3. 需要账号时使用软件的平台登录入口；从右侧视频库搜索、播放或打开文件目录。
 

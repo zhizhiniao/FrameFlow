@@ -1,6 +1,7 @@
 ﻿# WPF presentation layer. Download and article routines live in VideoDownloader.ps1.
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
 Add-Type -Path (Join-Path $root 'VideoDownloader.Runtime.cs')
+[Runtime.InteropServices.Marshal]::ThrowExceptionForHR([FrameflowWindow]::SetCurrentProcessExplicitAppUserModelID([FrameflowWindow]::AppId))
 try { [void][FrameflowWindow]::SetProcessDpiAwarenessContext([IntPtr](-4)) } catch {}
 
 $reader = [System.Xml.XmlReader]::Create((Join-Path $root 'VideoDownloader.xaml'))
@@ -229,6 +230,7 @@ $btnDel.Add_Click({
 $form.Add_SizeChanged({ $ComposeColumn.Width = [System.Windows.GridLength]::new($(if ($form.ActualWidth -lt 1040) { 296 } else { 336 })) })
 $form.Add_SourceInitialized({
   $handle = [System.Windows.Interop.WindowInteropHelper]::new($form).Handle
+  [FrameflowWindow]::ConfigureTaskbar($handle, (Join-Path $runtimeRoot 'FrameFlow.exe'), (Join-Path $root 'FrameFlow.ico'))
   $scale = [System.Windows.PresentationSource]::FromVisual($form).CompositionTarget.TransformToDevice
   $area = $screen.WorkingArea
   $form.Width = [Math]::Max($form.MinWidth, [Math]::Min($form.Width, $area.Width / $scale.M11 - 48))

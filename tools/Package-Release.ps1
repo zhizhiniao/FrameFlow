@@ -12,6 +12,7 @@ foreach ($name in @('browser','worker','ffmpeg','licenses','yt-dlp-plugins')) {
   Copy-Item -LiteralPath (Join-Path $RuntimeDirectory $name) -Destination (Join-Path $destination $name) -Recurse
 }
 Copy-Item -LiteralPath (Join-Path $RuntimeDirectory 'yt-dlp.exe') -Destination $destination
+foreach ($folder in @('docs','assets')) { Copy-Item -LiteralPath (Join-Path $project $folder) -Destination (Join-Path $destination $folder) -Recurse }
 @{version=$Version;repository='zhizhiniao/FrameFlow';channel='stable'} | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $project 'app-version.json') -Encoding UTF8
 foreach ($file in @('VideoDownloader.ps1','VideoDownloader.UI.ps1','VideoDownloader.Queue.ps1','VideoDownloader.Accounts.ps1','VideoDownloader.Settings.ps1','VideoDownloader.Library.ps1','VideoDownloader.Update.ps1','VideoDownloader.xaml','VideoDownloader.Runtime.cs','Update.Check.ps1','Update.Apply.ps1','app-version.json','FrameFlow.ico','README.md','THIRD-PARTY-NOTICES.md','LICENSE')) {
   Copy-Item -LiteralPath (Join-Path $project $file) -Destination $destination

@@ -16,7 +16,8 @@ function Quote-Arg([string]$s) {
 # ---- 必备路径 ----
 $root    = $PSScriptRoot
 $runtimeRoot = $root
-$bundledRoot = Join-Path $root 'release\FrameFlow-Portable-v0.2.4'
+$bundledVersion = (Get-Content -LiteralPath (Join-Path $root 'app-version.json') -Raw | ConvertFrom-Json).version
+$bundledRoot = Join-Path $root ('release\FrameFlow-Portable-v' + $bundledVersion)
 if (Test-Path -LiteralPath (Join-Path $bundledRoot 'worker\FrameFlow.Worker.exe')) { $runtimeRoot = $bundledRoot }
 $exe     = Join-Path $runtimeRoot 'yt-dlp.exe'
 $ffbin   = Join-Path $runtimeRoot 'ffmpeg\bin'
