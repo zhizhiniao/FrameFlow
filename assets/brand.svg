@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">帧流 FrameFlow — 流入画框</title>
+  <desc id="desc">陶土橙圆角方块，米白色流线拍板与融入画框的下载箭头。</desc>
+  <rect x="16" y="16" width="480" height="480" rx="116" fill="#D97757"/>
+  <g fill="#FAF9F5">
+    <path d="M82 264 C67 216 80 167 135 136 C204 98 314 99 411 69 Q418 66 418 74 L418 103 C418 140 399 151 365 158 C311 170 228 173 174 192 C124 210 91 232 82 264Z"/>
+    <path d="M108 248 V350 C108 380 127 402 157 402 H354 C385 402 407 380 407 350 V273 C407 252 392 237 371 237 H302 C276 237 255 257 255 283 V314" fill="none" stroke="#FAF9F5" stroke-width="46" stroke-linejoin="round"/>
+    <path d="M199 289 H311 C319 289 323 298 317 304 L265 364 Q255 375 245 364 L193 304 C187 298 191 289 199 289Z"/>
+  </g>
+</svg>

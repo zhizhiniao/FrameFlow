@@ -1,0 +1,17 @@
+release/
+.build*/
+.backups/
+vendor/
+__pycache__/
+tests/*/
+tests/*.json
+tests/*.pid
+*.log
+*.zip
+cookies/
+downloads/
+sessions/
+*.bin
+auth-settings*
+settings.json
+history.json
