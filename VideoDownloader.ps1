@@ -1,4 +1,4 @@
-﻿param([switch]$CookieSettings, [switch]$QueueTest, [switch]$SelfTest, [string]$ScreenshotDirectory, [switch]$DownloadTest, [string]$DataRoot, [string]$OutputDirectory, [ValidateSet("","all","douyin","xhs","tiktok","youtube","twitter","bilibili")][string]$LoginCheck = "")
+﻿param([switch]$CookieSettings, [switch]$QueueTest, [switch]$WechatTest, [switch]$SelfTest, [string]$ScreenshotDirectory, [switch]$DownloadTest, [string]$DataRoot, [string]$OutputDirectory, [ValidateSet("","all","douyin","xhs","tiktok","youtube","twitter","bilibili")][string]$LoginCheck = "")
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Windows.Forms
@@ -130,7 +130,7 @@ function Log([string]$msg) {
   if ($SelfTest) { Write-Host $msg }
 }
 
-$platformIds = @{ '光厂片场'='auto'; '哔哩哔哩'='bilibili'; 'YouTube'='youtube'; 'TikTok'='tiktok'; 'X'='twitter'; '小红书'='xhs'; '抖音'='douyin'; '抖音图文'='douyin'; '微信公众号'='weixin'; '自动'='auto' }
+$platformIds = @{ '光厂片场'='auto'; '哔哩哔哩'='bilibili'; 'YouTube'='youtube'; 'TikTok'='tiktok'; 'X'='twitter'; '小红书'='xhs'; '抖音'='douyin'; '抖音图文'='douyin'; '微信公众号'='weixin'; '微信视频号'='wxchannels'; '自动'='auto' }
 
 function Start-Worker([string[]]$arguments, [string]$logFile) {
   $command = $workerPrefix + (($arguments | ForEach-Object { Quote-Arg $_ }) -join ' ')

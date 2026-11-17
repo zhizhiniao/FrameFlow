@@ -14,7 +14,7 @@ $form.Icon = [System.Windows.Media.Imaging.BitmapFrame]::Create($iconUri,
 foreach ($name in @('AppSurface','ComposeColumn','txtUrl','urlPlaceholder','btnPaste','btnGo','goText',
     'lblDetect','lblStatus','lblProgress','progress','btnLogs','txtLog','txtSearch','searchPlaceholder',
     'lblCount','btnRefresh','lv','emptyState','emptyTitle','emptyHint','lblSelection','btnPlay','btnOpen',
-    'platformFilter','btnSettings','btnRetry','queueList','btnDel','lblTotal','lblPath','btnAccounts','lblAccounts','btnFolder','btnCancelLogin')) {
+    'queueStatusPanel','wechatDownloadProgress','btnLibraryView','btnCaptureView','lblWechatCount','libraryToolbar','libraryContent','libraryActions','captureHint','captureContent','captureSelectionHint','wechatEmptyState','lblWechatSelection','lblWechatDownloadState','btnLinkMode','btnWechatMode','linkDownloadPanel','wechatPanel','btnWechatCapture','btnWechatStop','lblWechatState','wechatCandidates','btnWechatDownload','platformFilter','btnSettings','btnRetry','queueList','btnDel','lblTotal','lblPath','btnAccounts','lblAccounts','btnFolder','btnCancelLogin')) {
   Set-Variable -Name $name -Value $form.FindName($name) -Scope Script
 }
 $lblPath.Text = $outDir
@@ -30,7 +30,7 @@ $script:dlLogFile = $null
 $script:dlLogPos = 0
 $script:lastDownload = $null
 
-function Set-TaskStatus([string]$state, [string]$detail, [string]$color = '#A4E9CE') {
+function Set-TaskStatus([string]$state, [string]$detail, [string]$color = '#D97757') {
   $lblStatus.Text = $state
   $lblStatus.Foreground = [System.Windows.Media.BrushConverter]::new().ConvertFromString($color)
   $lblProgress.Text = $detail
@@ -58,7 +58,7 @@ function Update-Detect {
   elseif ($hasText) { $lblDetect.Text = '未找到有效网址，请检查分享内容。' }
   else { $lblDetect.Text = '等待添加链接' }
   $lblDetect.Foreground = [System.Windows.Media.BrushConverter]::new().ConvertFromString(
-    $(if ($valid) { '#A4E9CE' } elseif ($hasText) { '#E8B986' } else { '#9FA9B6' }))
+    $(if ($valid) { '#D97757' } elseif ($hasText) { '#E8B986' } else { '#B0AAA0' }))
 }
 
 function Get-MediaThumbnail([string]$path) {
@@ -140,6 +140,7 @@ function Refresh-History {
 }
 
 . (Join-Path $root 'VideoDownloader.Queue.ps1')
+. (Join-Path $root 'VideoDownloader.Wechat.ps1')
 
 $script:dlTimer = [System.Windows.Threading.DispatcherTimer]::new()
 $script:dlTimer.Interval = [TimeSpan]::FromMilliseconds(200)
@@ -225,7 +226,7 @@ $btnDel.Add_Click({
     Save-History $script:history
     Refresh-History
     Set-TaskStatus '已删除' '所选文件已从本地视频库中移除。'
-  } catch { Set-TaskStatus '删除失败' '文件可能正在使用，请关闭播放器后重试。' '#EDA5A5'; Log ('[错误] ' + $_.Exception.Message) }
+  } catch { Set-TaskStatus '删除失败' '文件可能正在使用，请关闭播放器后重试。' '#E69B8F'; Log ('[错误] ' + $_.Exception.Message) }
 })
 $form.Add_SizeChanged({ $ComposeColumn.Width = [System.Windows.GridLength]::new($(if ($form.ActualWidth -lt 1040) { 296 } else { 336 })) })
 $form.Add_SourceInitialized({
@@ -237,7 +238,7 @@ $form.Add_SourceInitialized({
   $form.Height = [Math]::Max($form.MinHeight, [Math]::Min($form.Height, $area.Height / $scale.M22 - 48))
   $form.Left = $area.Left / $scale.M11 + ($area.Width / $scale.M11 - $form.Width) / 2
   $form.Top = $area.Top / $scale.M22 + ($area.Height / $scale.M22 - $form.Height) / 2
-  $dark = 1; $captionColor = 0x001F1A17
+  $dark = 1; $captionColor = 0x00242626
   try {
     [void][FrameflowWindow]::DwmSetWindowAttribute($handle, 20, [ref]$dark, 4)
     [void][FrameflowWindow]::DwmSetWindowAttribute($handle, 35, [ref]$captionColor, 4)
@@ -283,6 +284,8 @@ Refresh-History
 Log '就绪。粘贴链接后点击「开始下载」，或按 Enter。'
 if ($QueueTest) {
   . (Join-Path $root 'tests\Queue.Check.ps1')
+} elseif ($WechatTest) {
+  . (Join-Path $root 'tests\Wechat.UI.Check.ps1')
 } elseif ($SelfTest) {
   . (Join-Path $root 'tests\UI.Smoke.ps1')
 } else {

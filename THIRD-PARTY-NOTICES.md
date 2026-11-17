@@ -1,5 +1,7 @@
 # 第三方组件与源码
 
+微信视频号使用独立 GPL-3.0 组件 `FrameFlow.Wechat.exe`，改写自 laoyu20032003/wx_video_downloader 的文件头恢复方案。完整引擎源码随包位于 `source/wechat_capture.py`，许可全文为 `licenses/WechatCapture-GPL-3.0.txt`；固定上游提交、改动与构建方法见 [微信组件源码说明](docs/WECHAT-SOURCE.md)。该组件不按 MIT 许可分发。
+
 本便携包通过独立进程使用下列组件，保留各组件自己的许可；不改变上游许可。
 
 |组件|本次版本|许可/来源|

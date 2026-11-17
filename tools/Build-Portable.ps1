@@ -17,8 +17,9 @@ New-Item -ItemType Directory -Force -Path $pluginTarget | Out-Null
 foreach ($file in @('vjshi.py','case-player.cjs')) {
   Copy-Item -LiteralPath (Join-Path (Join-Path $dependencyRoot $pluginPath) $file) -Destination $pluginTarget -Force
 }
+& (Join-Path $PSScriptRoot 'Build-Wechat.ps1') -Destination $Destination
 # Explicit allowlist. Never recurse across the working project or user's data folders.
-foreach ($file in @('VideoDownloader.ps1','VideoDownloader.UI.ps1','VideoDownloader.Queue.ps1','VideoDownloader.Accounts.ps1','VideoDownloader.Settings.ps1','VideoDownloader.Library.ps1','VideoDownloader.Update.ps1','Update.Check.ps1','Update.Apply.ps1','app-version.json','LICENSE','VideoDownloader.xaml','VideoDownloader.Runtime.cs','yt-dlp.exe','FrameFlow.ico','README.md','便携版-验收记录.md','PORTABLE-使用说明.md','THIRD-PARTY-NOTICES.md')) {
+foreach ($file in @('VideoDownloader.ps1','VideoDownloader.UI.ps1','VideoDownloader.Queue.ps1','VideoDownloader.Wechat.ps1','VideoDownloader.Accounts.ps1','VideoDownloader.Settings.ps1','VideoDownloader.Library.ps1','VideoDownloader.Update.ps1','Update.Check.ps1','Update.Apply.ps1','app-version.json','LICENSE','VideoDownloader.xaml','VideoDownloader.Runtime.cs','yt-dlp.exe','FrameFlow.ico','README.md','便携版-验收记录.md','PORTABLE-使用说明.md','THIRD-PARTY-NOTICES.md')) {
   $sourceRoot=if($file -eq 'yt-dlp.exe'){$dependencyRoot}else{$project}
   Copy-Item -LiteralPath (Join-Path $sourceRoot $file) -Destination (Join-Path $Destination $file) -Force
 }
@@ -31,7 +32,7 @@ Get-ChildItem -LiteralPath (Split-Path $browser -Parent) | Copy-Item -Destinatio
 $compiler=Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 & $compiler /nologo /target:winexe /platform:x64 /reference:System.Windows.Forms.dll ('/win32icon:' + (Join-Path $project 'FrameFlow.ico')) ('/out:' + (Join-Path $Destination 'FrameFlow.exe')) (Join-Path $project 'FrameFlow.Launcher.cs')
 if ($LASTEXITCODE -ne 0) { throw 'Launcher build failed' }
-foreach ($file in @('frameflow_worker.py','cookiecloud_client.py','browser_media.py','douyin_note.py','FrameFlow.Launcher.cs')) { Copy-Item -LiteralPath (Join-Path $project $file) -Destination (Join-Path $Destination 'source') -Force }
+foreach ($file in @('wechat_capture.py','frameflow_worker.py','cookiecloud_client.py','browser_media.py','douyin_note.py','FrameFlow.Launcher.cs')) { Copy-Item -LiteralPath (Join-Path $project $file) -Destination (Join-Path $Destination 'source') -Force }
 Copy-Item -LiteralPath (Join-Path $dependencyRoot 'ffmpeg\ffmpeg-8.0-essentials_build\LICENSE') -Destination (Join-Path $Destination 'licenses\FFmpeg-GPL.txt') -Force
 Copy-Item -LiteralPath (Join-Path $dependencyRoot 'ffmpeg\ffmpeg-8.0-essentials_build\README.txt') -Destination (Join-Path $Destination 'licenses\FFmpeg-build.txt') -Force
 Get-ChildItem -LiteralPath (Join-Path $project 'licenses') -File | Copy-Item -Destination (Join-Path $Destination 'licenses') -Force

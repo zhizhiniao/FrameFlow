@@ -20,24 +20,24 @@ function Read-AuthSettings {
 
 function Show-CookieSettings {
   [xml]$markup=@'
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Cookie 设置" Width="620" Height="700" MinWidth="550" MinHeight="520" Background="#1E232A" Foreground="#E9EDF1" FontFamily="Microsoft YaHei UI" FontSize="14" WindowStartupLocation="CenterOwner">
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Cookie 设置" Width="620" Height="700" MinWidth="550" MinHeight="520" Background="#2D2C29" Foreground="#EEEade" FontFamily="Microsoft YaHei UI" FontSize="14" WindowStartupLocation="CenterOwner">
 <Grid Margin="28"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-<StackPanel><TextBlock Text="YouTube 登录与 Cookie" FontSize="22" FontWeight="SemiBold"/><TextBlock Text="内置登录会自动保存会话，无需 Docker 或浏览器扩展。" Foreground="#ADB8C4" Margin="0,12,0,20" TextWrapping="Wrap"/></StackPanel>
+<StackPanel><TextBlock Text="YouTube 登录与 Cookie" FontSize="22" FontWeight="SemiBold"/><TextBlock Text="内置登录会自动保存会话，无需 Docker 或浏览器扩展。" Foreground="#B0AAA0" Margin="0,12,0,20" TextWrapping="Wrap"/></StackPanel>
 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><StackPanel>
 <TextBlock Text="会话来源" Margin="0,0,0,10"/>
-<RadioButton x:Name="SourceBrowser" GroupName="source" Content="内置浏览器（推荐）" Foreground="#E9EDF1" Margin="0,0,0,12"/>
-<RadioButton x:Name="SourceCloud" GroupName="source" Content="外部 CookieCloud" Foreground="#E9EDF1" Margin="0,0,0,12"/>
-<RadioButton x:Name="SourceManual" GroupName="source" Content="已导入的 Cookie 文件" Foreground="#E9EDF1" Margin="0,0,0,18"/>
-<CheckBox x:Name="AutoRefresh" Content="下载前自动刷新内置会话" Foreground="#E9EDF1" Margin="0,0,0,20"/>
+<RadioButton x:Name="SourceBrowser" GroupName="source" Content="内置浏览器（推荐）" Foreground="#EEEade" Margin="0,0,0,12"/>
+<RadioButton x:Name="SourceCloud" GroupName="source" Content="外部 CookieCloud" Foreground="#EEEade" Margin="0,0,0,12"/>
+<RadioButton x:Name="SourceManual" GroupName="source" Content="已导入的 Cookie 文件" Foreground="#EEEade" Margin="0,0,0,18"/>
+<CheckBox x:Name="AutoRefresh" Content="下载前自动刷新内置会话" Foreground="#EEEade" Margin="0,0,0,20"/>
 <TextBlock Text="YouTube 网络代理（留空使用默认网络）" Margin="0,0,0,8"/>
 <TextBox x:Name="Proxy" ToolTip="例如 http://127.0.0.1:7890；不含用户名或密码"/>
-<Expander x:Name="Advanced" Header="外部 CookieCloud 配置" Foreground="#E9EDF1" Margin="0,20,0,16"><StackPanel Margin="0,12,8,0">
+<Expander x:Name="Advanced" Header="外部 CookieCloud 配置" Foreground="#EEEade" Margin="0,20,0,16"><StackPanel Margin="0,12,8,0">
 <TextBlock Text="服务地址" Margin="0,0,0,8"/><TextBox x:Name="Endpoint"/>
 <TextBlock Text="UUID" Margin="0,12,0,8"/><TextBox x:Name="Uuid"/>
-<TextBlock Text="同步密码" Margin="0,12,0,8"/><PasswordBox x:Name="CloudPassword" Padding="12" Background="#171C22" Foreground="#E9EDF1"/>
-<TextBlock Text="凭据加密保存在当前 Windows 用户目录，不写入日志。" Foreground="#ADB8C4" TextWrapping="Wrap" Margin="0,12,0,0"/>
+<TextBlock Text="同步密码" Margin="0,12,0,8"/><PasswordBox x:Name="CloudPassword" Padding="12" Background="#292825" Foreground="#EEEade"/>
+<TextBlock Text="凭据加密保存在当前 Windows 用户目录，不写入日志。" Foreground="#B0AAA0" TextWrapping="Wrap" Margin="0,12,0,0"/>
 </StackPanel></Expander>
-<TextBlock x:Name="SettingsStatus" TextWrapping="Wrap" Foreground="#A4E9CE" LineHeight="22" Margin="0,0,0,16"/>
+<TextBlock x:Name="SettingsStatus" TextWrapping="Wrap" Foreground="#D97757" LineHeight="22" Margin="0,0,0,16"/>
 </StackPanel></ScrollViewer>
 <WrapPanel Grid.Row="2" Margin="0,16,0,0"><Button x:Name="SaveSettings" Content="保存设置" Margin="0,0,8,8"/><Button x:Name="SettingsLogin" Content="保存并登录 / 更新" Margin="0,0,8,8"/><Button Content="关闭" IsCancel="True" Margin="0,0,0,8"/></WrapPanel>
 </Grid></Window>

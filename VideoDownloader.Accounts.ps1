@@ -56,7 +56,7 @@ function Start-PlatformLogin([string]$id) {
   } catch {
     $script:pendingDownload = $false
     Set-Busy $false
-    Set-TaskStatus '无法打开登录' '请确认已完整解压便携包。' '#EDA5A5'
+    Set-TaskStatus '无法打开登录' '请确认已完整解压便携包。' '#E69B8F'
   }
 }
 
@@ -103,7 +103,7 @@ function Show-Accounts {
   $dialog.Width = 650; $dialog.Height = 610
   $dialog.Icon = $form.Icon
   $dialog.ResizeMode = 'NoResize'; $dialog.WindowStartupLocation = 'CenterOwner'; $dialog.Owner = $form
-  $dialog.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString('#1E232A')
+  $dialog.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString('#2D2C29')
   $dialog.Foreground = [System.Windows.Media.Brushes]::White
   $dialog.FontFamily = $form.FontFamily; $dialog.FontSize = 13
   $dialog.Resources = $form.Resources

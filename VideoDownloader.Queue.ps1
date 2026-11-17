@@ -13,6 +13,7 @@ function Update-Queue {
   $queueList.Items.Refresh()
   $lblStatus.Text = if ($script:busy) { '进行中 {0} · 等待 {1}' -f $active.Count,$waiting.Count } else { '完成 {0} · 失败 {1}' -f @($finished | Where-Object state -eq '已完成').Count,@($finished | Where-Object state -eq '失败').Count }
   $lblProgress.Text = '最多同时下载 {0} 个任务，可继续添加链接。' -f $script:maxDownloads
+  if (Get-Command Update-WechatDownloadStatus -ErrorAction SilentlyContinue) { Update-WechatDownloadStatus }
   $progress.Value = if ($active.Count) { ($active | Measure-Object percent -Average).Average } else { 0 }
 }
 
@@ -41,12 +42,14 @@ function Start-QueuedDownloads {
     if ($active.Count -ge $script:maxDownloads) { break }
     $platformId = $platformIds[$task.platform]
     # Chromium persistent profiles cannot be opened by two workers at once.
-    if ($platformId -in @('douyin','xhs','bilibili') -and @($active | Where-Object { $platformIds[$_.platform] -eq $platformId }).Count) { continue }
+    if ($platformId -in @('douyin','xhs','bilibili','wxchannels') -and @($active | Where-Object { $platformIds[$_.platform] -eq $platformId }).Count) { continue }
     try {
       [void][IO.Directory]::CreateDirectory($task.staging)
       [void][IO.Directory]::CreateDirectory((Split-Path $task.logFile))
       $task.logPos=0
-      $task.proc = Invoke-Download $task.platform $task.url $task.logFile $task.staging
+      if ($task.platform -eq '微信视频号') {
+        $task.proc=Start-WechatEngine @('save','--manifest',$task.manifest,'--output',$task.staging) $task.logFile
+      } else { $task.proc = Invoke-Download $task.platform $task.url $task.logFile $task.staging }
       $task.state = '下载中'; $task.detail='正在解析链接'
     } catch { $task.state='失败'; $task.detail='启动失败，请展开日志'; Log ('[任务 '+$task.id.Substring(0,6)+'] '+$_.Exception.Message) }
   }
@@ -129,7 +132,7 @@ function Poll-Download {
     } elseif ($code -eq 10 -and $task.retries -lt 1 -and $platformIds[$task.platform] -in @('youtube','twitter','tiktok','douyin','xhs','bilibili')) {
       $task.retries++; $task.state='等待登录'; $task.detail='其他下载结束后自动登录'
     } else {
-      $task.state='失败'; $task.detail=if ($code -eq 12) { 'B 站请求受限，请在平台登录中更新登录态，稍后重试' } elseif ($code -eq 11) { '请在 Cookie 设置中登录 / 更新，然后重试失败任务' } else { '请查看日志后重新添加链接' }
+      $task.state='失败'; $task.detail=if ($task.platform -eq '微信视频号') { '请保持播放，重新抓取并确认封面后再下载' } elseif ($code -eq 12) { 'B 站请求受限，请在平台登录中更新登录态，稍后重试' } elseif ($code -eq 11) { '请在 Cookie 设置中登录 / 更新，然后重试失败任务' } else { '请查看日志后重新添加链接' }
       $txtLog.Visibility='Visible'; $btnLogs.Content='收起日志'
     }
   }
