@@ -1,5 +1,5 @@
-﻿{
-    "channel":  "stable",
-    "version":  "0.3.4",
-    "repository":  "zhizhiniao/FrameFlow"
+{
+  "repository": "zhizhiniao/FrameFlow",
+  "version": "0.3.5",
+  "channel": "stable"
 }

@@ -19,6 +19,7 @@ foreach ($name in @('AppSurface','ComposeColumn','txtUrl','urlPlaceholder','btnP
 }
 $lblPath.Text = $outDir
 $lblPath.ToolTip = $outDir
+. (Join-Path $root 'VideoDownloader.Platforms.ps1')
 $script:history = @(Load-History)
 try { Initialize-PlatformLibrary } catch { [System.Windows.MessageBox]::Show("旧文件归类未完成，文件已保留："+$_.Exception.Message,"归类提示") | Out-Null }
 $script:allMedia = @()

@@ -1,4 +1,4 @@
-# 第三方组件与源码
+﻿# 第三方组件与源码
 
 微信视频号使用独立 GPL-3.0 组件 `FrameFlow.Wechat.exe`，改写自 laoyu20032003/wx_video_downloader 的文件头恢复方案。完整引擎源码随包位于 `source/wechat_capture.py`，许可全文为 `licenses/WechatCapture-GPL-3.0.txt`；固定上游提交、改动与构建方法见 [微信组件源码说明](docs/WECHAT-SOURCE.md)。该组件不按 MIT 许可分发。
 
@@ -6,7 +6,7 @@
 
 |组件|本次版本|许可/来源|
 |---|---|---|
-|yt-dlp Windows 独立程序|2026.08.19|独立程序含 GPLv3+ 组件；源码 https://github.com/yt-dlp/yt-dlp/tree/2026.08.19 ，随包许可见 licenses|
+|yt-dlp Windows 独立程序|2026.10.26|独立程序含 GPLv3+ 组件；源码 https://github.com/yt-dlp/yt-dlp/tree/2026.10.26 ，随包许可见 licenses|
 |FFmpeg / ffprobe Gyan essentials|8.0|该构建启用了 GPL/version3；许可、构建参数见 licenses/FFmpeg-*；构建来源 https://www.gyan.dev/ffmpeg/builds/ ，FFmpeg 源码 https://ffmpeg.org/releases/ffmpeg-8.0.tar.xz|
 |Python|3.12.10|PSF；https://www.python.org/downloads/release/python-31210/ ，许可见 licenses|
 |Playwright Python|1.62.0|Apache-2.0；https://github.com/microsoft/playwright-python/tree/v1.62.0|
@@ -23,3 +23,5 @@ CookieCloud 客户端使用 PyCryptodome（pycryptodomex 3.23.0）完成本地 A
 
 
 YouTube 登录使用 Patchright Python 1.58.2（Apache-2.0，https://github.com/Kaliiiiiiiiii-Vinyzu/patchright-python）；优先启动系统 Chrome/Edge 的独立资料目录。其他平台仍使用 Playwright。
+
+平台图标来自 Simple Icons（CC0 1.0），许可见 `licenses/Simple-Icons-CC0.txt`。品牌名称与商标属于各自权利人；图标不表示官方合作。来源：https://github.com/simple-icons/simple-icons 。

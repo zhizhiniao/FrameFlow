@@ -10,6 +10,8 @@ Windows 本地视频与图文下载工具。粘贴链接或分享文案，在本
 
 [下载最新版](https://github.com/zhizhiniao/FrameFlow/releases/latest) · [自动更新说明](docs/AUTO-UPDATE.md) · [反馈问题](https://github.com/zhizhiniao/FrameFlow/issues)
 
+本机 **0.3.5 预览**：底部常用平台 Logo、可搜索的网站名单、Instagram 独立登录与分类。Instagram 公开 Reel、MP4 直链和 M3U8 已下载并完整解码验证；[平台范围与限制](docs/PLATFORMS.md)。GitHub 正式版仍为 0.3.4。
+
 ## 开始使用
 
 1. 从 Releases 下载最新 `FrameFlow-Portable-v版本号-Windows-x64.zip`，完整解压到有写入权限的目录。

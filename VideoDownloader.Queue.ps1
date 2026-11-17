@@ -129,7 +129,7 @@ function Poll-Download {
     if ($code -eq 0) {
       try { Complete-TaskFiles $task; $task.state='已完成'; $task.percent=100; $task.detail='已保存'; Refresh-History }
       catch { $task.state='失败'; $task.detail='文件整理失败，产物保留在 '+$task.staging; Log $_.Exception.Message }
-    } elseif ($code -eq 10 -and $task.retries -lt 1 -and $platformIds[$task.platform] -in @('youtube','twitter','tiktok','douyin','xhs','bilibili')) {
+    } elseif ($code -eq 10 -and $task.retries -lt 1 -and $platformIds[$task.platform] -in @('youtube','twitter','tiktok','douyin','xhs','bilibili','instagram')) {
       $task.retries++; $task.state='等待登录'; $task.detail='其他下载结束后自动登录'
     } else {
       $task.state='失败'; $task.detail=if ($task.platform -eq '微信视频号') { '请保持播放，重新抓取并确认封面后再下载' } elseif ($code -eq 12) { 'B 站请求受限，请在平台登录中更新登录态，稍后重试' } elseif ($code -eq 11) { '请在 Cookie 设置中登录 / 更新，然后重试失败任务' } else { '请查看日志后重新添加链接' }

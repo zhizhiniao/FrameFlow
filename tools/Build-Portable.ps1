@@ -19,7 +19,7 @@ foreach ($file in @('vjshi.py','case-player.cjs')) {
 }
 & (Join-Path $PSScriptRoot 'Build-Wechat.ps1') -Destination $Destination
 # Explicit allowlist. Never recurse across the working project or user's data folders.
-foreach ($file in @('VideoDownloader.ps1','VideoDownloader.UI.ps1','VideoDownloader.Queue.ps1','VideoDownloader.Wechat.ps1','VideoDownloader.Accounts.ps1','VideoDownloader.Settings.ps1','VideoDownloader.Library.ps1','VideoDownloader.Update.ps1','Update.Check.ps1','Update.Apply.ps1','app-version.json','LICENSE','VideoDownloader.xaml','VideoDownloader.Runtime.cs','yt-dlp.exe','FrameFlow.ico','README.md','便携版-验收记录.md','PORTABLE-使用说明.md','THIRD-PARTY-NOTICES.md')) {
+foreach ($file in @('VideoDownloader.ps1','VideoDownloader.UI.ps1','VideoDownloader.Platforms.ps1','VideoDownloader.Queue.ps1','VideoDownloader.Wechat.ps1','VideoDownloader.Accounts.ps1','VideoDownloader.Settings.ps1','VideoDownloader.Library.ps1','VideoDownloader.Update.ps1','Update.Check.ps1','Update.Apply.ps1','app-version.json','LICENSE','VideoDownloader.xaml','VideoDownloader.Runtime.cs','yt-dlp.exe','FrameFlow.ico','README.md','便携版-验收记录.md','PORTABLE-使用说明.md','THIRD-PARTY-NOTICES.md')) {
   $sourceRoot=if($file -eq 'yt-dlp.exe'){$dependencyRoot}else{$project}
   Copy-Item -LiteralPath (Join-Path $sourceRoot $file) -Destination (Join-Path $Destination $file) -Force
 }

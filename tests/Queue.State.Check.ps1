@@ -48,5 +48,12 @@ $script:tasks.Add($failed); Retry-FailedTasks
 Assert-State ($failed.state -eq '下载中' -and $failed.logPos -eq 0 -and $failed.retries -eq 0) 'Retry reuses failed task and resets log cursor and retry budget'
 $duplicate=New-Task 'retry' 'YouTube'; $duplicate.state='失败'; $script:tasks.Add($duplicate); Retry-FailedTasks
 Assert-State ($duplicate.state -eq '失败') 'Retry does not duplicate an active URL'
+$script:tasks.Clear(); $script:loginProc=$null; $platformIds['Instagram']='instagram'
+$ig=New-Task 'instagram-login' 'Instagram'; $script:tasks.Add($ig); Start-QueuedDownloads
+$ig.proc.HasExited=$true; $ig.proc.ExitCode=10; Poll-Download
+Assert-State ($ig.state -eq '登录中' -and $script:loginProc.platform -eq 'instagram') 'Instagram requests its own account when authentication is required'
+$script:loginProc=$null; Complete-QueueLogin $true; Start-QueuedDownloads
+$ig.proc.HasExited=$true; $ig.proc.ExitCode=10; Poll-Download
+Assert-State ($ig.state -eq '失败' -and $null -eq $script:loginProc) 'Instagram authentication cannot repeat indefinitely'
 @{passed=$true;checks=$script:checks} | ConvertTo-Json | Set-Content (Join-Path $PSScriptRoot 'queue-state/result.json') -Encoding UTF8
 

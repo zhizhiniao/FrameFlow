@@ -1,4 +1,4 @@
-﻿$script:platformFolders=@('哔哩哔哩','YouTube','抖音','小红书','TikTok','X','微信视频号','微信公众号','光厂片场','未分类')
+﻿$script:platformFolders=@('哔哩哔哩','YouTube','Instagram','Vimeo','抖音','小红书','TikTok','X','微信视频号','微信公众号','光厂片场','未分类')
 
 function Get-PlatformFolder([string]$platform) {
   switch ($platform) {

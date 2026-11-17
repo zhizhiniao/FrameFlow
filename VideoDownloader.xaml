@@ -126,7 +126,7 @@
     </DataTemplate>
   </Window.Resources>
   <Grid x:Name="AppSurface" Background="#262624">
-    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
+    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="40"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
     <Grid>
       <Grid.ColumnDefinitions><ColumnDefinition x:Name="ComposeColumn" Width="336"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
       <Border Background="#2D2C29" BorderBrush="{StaticResource Line}" BorderThickness="0,0,1,0">
@@ -288,6 +288,9 @@
           <TextBlock x:Name="lblPath" Text="" MaxWidth="570" TextTrimming="CharacterEllipsis" Foreground="#B0AAA0" FontSize="11"/>
         </StackPanel>
       </DockPanel>
+    </Border>
+    <Border Grid.Row="2" Background="#242321" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="24,6">
+      <WrapPanel x:Name="platformLogos" VerticalAlignment="Center"/>
     </Border>
   </Grid>
 </Window>

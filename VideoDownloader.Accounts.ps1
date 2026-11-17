@@ -5,7 +5,7 @@ $script:authDialog = $null
 $script:accountLabels = @{}
 $script:loginAuditQueue = [Collections.Generic.Queue[string]]::new()
 $script:loginAudit = @()
-$accountNames = [ordered]@{ bilibili='哔哩哔哩'; youtube='YouTube'; tiktok='TikTok'; twitter='X (Twitter)'; xhs='小红书'; douyin='抖音' }
+$accountNames = [ordered]@{ bilibili='哔哩哔哩'; youtube='YouTube'; instagram='Instagram'; tiktok='TikTok'; twitter='X (Twitter)'; xhs='小红书'; douyin='抖音' }
 
 function Test-CloudConnection([string]$id) {
   if ($id -eq 'youtube') {
@@ -162,7 +162,8 @@ function Show-Accounts {
   }
   $foot=[System.Windows.Controls.TextBlock]::new(); $foot.Text='登录态仅供本机当前 Windows 用户使用。其他人使用便携包时自行登录。'; $foot.TextWrapping='Wrap'; $foot.FontSize=11; $foot.Foreground=[System.Windows.Media.Brushes]::LightSlateGray; $foot.Margin='0,8,0,0'
   $panel.Children.Add($foot) | Out-Null
-  $dialog.Content=$panel; $script:authDialog=$dialog
+  $scroll=[Windows.Controls.ScrollViewer]::new(); $scroll.VerticalScrollBarVisibility='Auto'; $scroll.Content=$panel
+  $dialog.Content=$scroll; $script:authDialog=$dialog
   Update-Accounts
   [void]$dialog.ShowDialog()
   $script:authDialog=$null; $script:accountLabels=@{}

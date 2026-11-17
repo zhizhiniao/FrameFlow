@@ -20,7 +20,8 @@ if sys.stdout:
 
 ROOT = Path(sys.executable).resolve().parent.parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent
 if not getattr(sys, "frozen", False):
-    for version in ("0.2.4", "0.2.3", "0.2.2", "0.2.1", "0.2.0"):
+    current = json.loads((ROOT / 'app-version.json').read_text(encoding='utf-8-sig'))['version']
+    for version in dict.fromkeys((current, "0.3.4", "0.2.4", "0.2.3", "0.2.2", "0.2.1", "0.2.0")):
         bundle = ROOT / "release" / ("FrameFlow-Portable-v" + version)
         if (bundle / "worker/FrameFlow.Worker.exe").exists():
             ROOT = bundle
@@ -29,6 +30,7 @@ if not getattr(sys, "frozen", False):
 PLATFORMS = {
     "bilibili": ("哔哩哔哩", "https://www.bilibili.com/", ("bilibili.com",)),
     "youtube": ("YouTube", "https://www.youtube.com/", ("youtube.com", "google.com")),
+    "instagram": ("Instagram", "https://www.instagram.com/", ("instagram.com",)),
     "tiktok": ("TikTok", "https://www.tiktok.com/", ("tiktok.com",)),
     "twitter": ("X (Twitter)", "https://x.com/i/flow/login", ("x.com", "twitter.com")),
     "xhs": ("小红书", "https://www.xiaohongshu.com/explore", ("xiaohongshu.com",)),
@@ -84,6 +86,8 @@ def has_auth(cookies, platform, account_confirmed=False):
         return 'SESSDATA' in names
     if platform in ("douyin", "tiktok"):
         return bool(names & {"sessionid", "sessionid_ss", "sid_guard"})
+    if platform == "instagram":
+        return "sessionid" in names
     if platform == "twitter":
         # Guest cookies (including ct0 alone) do not establish an account session.
         for domain in PLATFORMS[platform][2]:
@@ -393,6 +397,8 @@ def resolve_platform(platform, url):
     host = (urllib.parse.urlsplit(url).hostname or '').lower()
     if platform == 'auto' and (host == 'b23.tv' or host == 'bilibili.com' or host.endswith('.bilibili.com')):
         return 'bilibili'
+    if platform == 'auto' and (host == 'instagram.com' or host.endswith('.instagram.com')):
+        return 'instagram'
     return platform
 
 
@@ -454,7 +460,7 @@ def download(args):
                 print(safe_log(line), end="")
                 if args.platform == 'bilibili' and re.search(r'HTTP Error (?:412|403)|blocked by server|风控', line, re.I):
                     bili_blocked = True
-                if re.search(r"fresh cookies|cookies are no longer valid|sign in to confirm|login required|log in to access|use --cookies|could not authenticate you|invalid or expired token|需要登录", line, re.I):
+                if re.search(r"fresh cookies|cookies are no longer valid|sign in to confirm|login required|log in to access|you need to log in|login_required|use --cookies|could not authenticate you|invalid or expired token|需要登录", line, re.I):
                     auth_error = True
             code = proc.wait()
         if code and bili_blocked:

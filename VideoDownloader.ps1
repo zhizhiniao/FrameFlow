@@ -1,4 +1,4 @@
-﻿param([switch]$CookieSettings, [switch]$QueueTest, [switch]$WechatTest, [switch]$SelfTest, [string]$ScreenshotDirectory, [switch]$DownloadTest, [string]$DataRoot, [string]$OutputDirectory, [ValidateSet("","all","douyin","xhs","tiktok","youtube","twitter","bilibili")][string]$LoginCheck = "")
+﻿param([switch]$CookieSettings, [switch]$QueueTest, [switch]$WechatTest, [switch]$SelfTest, [string]$ScreenshotDirectory, [switch]$DownloadTest, [string]$DataRoot, [string]$OutputDirectory, [ValidateSet("","all","douyin","xhs","tiktok","youtube","twitter","bilibili","instagram")][string]$LoginCheck = "")
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Windows.Forms
@@ -49,6 +49,8 @@ $mediaExts = @('.mp4','.webm','.mkv','.mov','.m4v','.avi','.flv','.ts','.wmv','.
 $platforms = [ordered]@{
   '哔哩哔哩' = @{ re = 'bilibili\.com|b23\.tv'; referer = 'https://www.bilibili.com/'; cookie = 'bilibili.txt'; required = $false }
   'YouTube' = @{ re = 'youtube\.com|youtu\.be'; referer = 'https://www.youtube.com/';     cookie = 'youtube.txt'; required = $false }
+  'Instagram' = @{ re = 'instagram\.com'; referer = 'https://www.instagram.com/'; cookie = 'instagram.txt'; required = $false }
+  'Vimeo' = @{ re = 'vimeo\.com'; referer = 'https://vimeo.com/'; cookie = ''; required = $false }
   'X'       = @{ re = 'x\.com|twitter\.com'; referer = 'https://x.com/'; cookie = 'twitter.txt'; required = $false }
   'TikTok'  = @{ re = 'tiktok\.com';            referer = 'https://www.tiktok.com/';      cookie = 'tiktok.txt';  required = $false }
   '小红书'  = @{ re = 'xiaohongshu\.com|xhslink\.com';       referer = 'https://www.xiaohongshu.com/'; cookie = 'xhs.txt';     required = $true  }
@@ -130,7 +132,7 @@ function Log([string]$msg) {
   if ($SelfTest) { Write-Host $msg }
 }
 
-$platformIds = @{ '光厂片场'='auto'; '哔哩哔哩'='bilibili'; 'YouTube'='youtube'; 'TikTok'='tiktok'; 'X'='twitter'; '小红书'='xhs'; '抖音'='douyin'; '抖音图文'='douyin'; '微信公众号'='weixin'; '微信视频号'='wxchannels'; '自动'='auto' }
+$platformIds = @{ '光厂片场'='auto'; '哔哩哔哩'='bilibili'; 'YouTube'='youtube'; 'Instagram'='instagram'; 'Vimeo'='auto'; 'TikTok'='tiktok'; 'X'='twitter'; '小红书'='xhs'; '抖音'='douyin'; '抖音图文'='douyin'; '微信公众号'='weixin'; '微信视频号'='wxchannels'; '自动'='auto' }
 
 function Start-Worker([string[]]$arguments, [string]$logFile) {
   $command = $workerPrefix + (($arguments | ForEach-Object { Quote-Arg $_ }) -join ' ')
