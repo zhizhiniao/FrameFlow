@@ -23,6 +23,11 @@ foreach ($file in @('VideoDownloader.ps1','VideoDownloader.UI.ps1','VideoDownloa
   $sourceRoot=if($file -eq 'yt-dlp.exe'){$dependencyRoot}else{$project}
   Copy-Item -LiteralPath (Join-Path $sourceRoot $file) -Destination (Join-Path $Destination $file) -Force
 }
+foreach ($folder in @('assets','docs')) {
+  $folderTarget=Join-Path $Destination $folder
+  New-Item -ItemType Directory -Force -Path $folderTarget | Out-Null
+  Get-ChildItem -LiteralPath (Join-Path $project $folder) -Force | Copy-Item -Destination $folderTarget -Recurse -Force
+}
 New-Item -ItemType Directory -Force -Path (Join-Path $Destination 'ffmpeg\bin'),(Join-Path $Destination 'worker'),(Join-Path $Destination 'browser'),(Join-Path $Destination 'licenses'),(Join-Path $Destination 'source') | Out-Null
 foreach ($file in @('ffmpeg.exe','ffprobe.exe')) { Copy-Item -LiteralPath (Join-Path $dependencyRoot ('ffmpeg\bin\'+$file)) -Destination (Join-Path $Destination 'ffmpeg\bin') -Force }
 Get-ChildItem -LiteralPath (Join-Path $project '.build\worker-dist\FrameFlow.Worker') | Copy-Item -Destination (Join-Path $Destination 'worker') -Recurse -Force
@@ -32,7 +37,7 @@ Get-ChildItem -LiteralPath (Split-Path $browser -Parent) | Copy-Item -Destinatio
 $compiler=Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 & $compiler /nologo /target:winexe /platform:x64 /reference:System.Windows.Forms.dll ('/win32icon:' + (Join-Path $project 'FrameFlow.ico')) ('/out:' + (Join-Path $Destination 'FrameFlow.exe')) (Join-Path $project 'FrameFlow.Launcher.cs')
 if ($LASTEXITCODE -ne 0) { throw 'Launcher build failed' }
-foreach ($file in @('wechat_capture.py','frameflow_worker.py','cookiecloud_client.py','browser_media.py','douyin_note.py','FrameFlow.Launcher.cs')) { Copy-Item -LiteralPath (Join-Path $project $file) -Destination (Join-Path $Destination 'source') -Force }
+foreach ($file in @('wechat_capture.py','frameflow_worker.py','cookiecloud_client.py','browser_media.py','douyin_note.py','FrameFlow.Launcher.cs','requirements-build.txt')) { Copy-Item -LiteralPath (Join-Path $project $file) -Destination (Join-Path $Destination 'source') -Force }
 Copy-Item -LiteralPath (Join-Path $dependencyRoot 'ffmpeg\ffmpeg-8.0-essentials_build\LICENSE') -Destination (Join-Path $Destination 'licenses\FFmpeg-GPL.txt') -Force
 Copy-Item -LiteralPath (Join-Path $dependencyRoot 'ffmpeg\ffmpeg-8.0-essentials_build\README.txt') -Destination (Join-Path $Destination 'licenses\FFmpeg-build.txt') -Force
 Get-ChildItem -LiteralPath (Join-Path $project 'licenses') -File | Copy-Item -Destination (Join-Path $Destination 'licenses') -Force

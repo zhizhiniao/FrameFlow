@@ -55,5 +55,10 @@ Assert-State ($ig.state -eq '登录中' -and $script:loginProc.platform -eq 'ins
 $script:loginProc=$null; Complete-QueueLogin $true; Start-QueuedDownloads
 $ig.proc.HasExited=$true; $ig.proc.ExitCode=10; Poll-Download
 Assert-State ($ig.state -eq '失败' -and $null -eq $script:loginProc) 'Instagram authentication cannot repeat indefinitely'
+$script:tasks.Clear(); $script:loginProc=$null
+$dy=New-Task 'douyin-parse-failure' '抖音'; $script:tasks.Add($dy); Start-QueuedDownloads
+$dy.proc.HasExited=$true; $dy.proc.ExitCode=1; Poll-Download
+Assert-State ($dy.state -eq '失败' -and $null -eq $script:loginProc -and $dy.retries -eq 0) 'Douyin parse failure never opens login or consumes authentication retry'
+Assert-State ($dy.detail -notmatch '登录|Cookie') 'Generic parse failure directs the user to its diagnostic log'
 @{passed=$true;checks=$script:checks} | ConvertTo-Json | Set-Content (Join-Path $PSScriptRoot 'queue-state/result.json') -Encoding UTF8
 

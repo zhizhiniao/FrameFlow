@@ -9,6 +9,163 @@ import time
 import urllib.parse
 import urllib.request
 
+from playwright.sync_api import Error as BrowserError
+
+
+def _network_reason(error):
+    # Playwright messages contain full URLs and request headers. Keep only a code.
+    match = re.search(r'net::(ERR_[A-Z0-9_]+)', str(error))
+    if match:
+        return match[1]
+    message = str(error).lower()
+    if 'timeout' in type(error).__name__.lower() or 'timeout' in message:
+        return '等待超时'
+    if 'execution context was destroyed' in message or 'cannot find context with specified id' in message:
+        return '页面跳转导致执行上下文重建'
+    if 'interrupted by another navigation' in message:
+        return '当前导航被另一次页面跳转打断'
+    if 'has been closed' in message:
+        return '页面或浏览器已关闭'
+    return '浏览器操作失败'
+
+
+def _douyin_gate(page):
+    return page.evaluate('''() => {
+        const visible = e => {
+            if (!e) return false;
+            const r = e.getBoundingClientRect(), s = getComputedStyle(e);
+            return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' &&
+                s.display !== 'none' && s.opacity !== '0';
+        };
+        if ([...document.querySelectorAll('#captcha_container,.captcha_verify_container')].some(visible))
+            return 'verification';
+        const messages = [...document.querySelectorAll('p,span,div,h1,h2')]
+            .filter(e => e.children.length === 0 && visible(e)).map(e => e.innerText?.trim());
+        if (messages.some(t => /^(请完成安全验证|请完成下方验证|拖动滑块完成验证)$/.test(t))) return 'verification';
+        if (messages.some(t => /^(该作品已被删除|作品已删除|视频已删除|作品不存在|作品已下架)[。！!]?$/.test(t)))
+            return 'unavailable';
+        if (location.pathname === '/login' || messages.some(t =>
+            /^(登录已过期|登录失效，请重新登录|请登录后观看|登录后才能观看)[。！!]?$/.test(t))) return 'login';
+        return null;
+    }''')
+
+
+def parse_douyin(page, context, url, attempts=3, wait_seconds=20):
+    """Retry only page parsing, before any media is written; preserve the session."""
+    details, state = {}, {}
+    detail_path = '/aweme/v1/web/aweme/detail/'
+
+    def observe(response):
+        parsed = urllib.parse.urlsplit(response.url)
+        if parsed.hostname != 'www.douyin.com' or parsed.path != detail_path:
+            return
+        status = response.status
+        parts = [f'详情接口 HTTP {status}']
+        state['detail'] = '，'.join(parts)
+        if status < 200 or status >= 300:
+            state['retry_http'] = True
+            if status == 429:
+                state['delay'] = 30
+            return
+        try:
+            payload = response.json()
+        except (ValueError, BrowserError, TypeError):
+            kind = response.headers.get('content-type', '').split(';')[0].lower()
+            kind = kind if kind in ('text/html', 'text/plain', 'application/json') else '未知类型'
+            state['detail'] = '，'.join(parts + [f'非有效 JSON（{kind}）'])
+            return
+        if not isinstance(payload, dict):
+            state['detail'] = '，'.join(parts + ['JSON 结构异常'])
+            return
+        code = str(payload.get('status_code', ''))
+        if re.fullmatch(r'-?\d{1,12}', code):
+            parts.append('业务码 ' + code)
+        item = payload.get('aweme_detail')
+        if not isinstance(item, dict) or not re.fullmatch(r'\d+', str(item.get('aweme_id', ''))):
+            parts.append('缺少 aweme_detail 或作品 ID')
+        else:
+            details[str(item['aweme_id'])] = item
+            parts.append('已返回作品数据')
+        state['detail'] = '，'.join(parts)
+
+    def failed(request):
+        parsed = urllib.parse.urlsplit(request.url)
+        if parsed.hostname == 'www.douyin.com' and parsed.path == detail_path:
+            state['detail'] = '详情接口请求失败（' + _network_reason(request.failure or '') + '）'
+
+    context.on('response', observe)
+    context.on('requestfailed', failed)
+    current_url, ident = url, ''
+    terminal = {
+        'verification': '抖音页面要求安全验证，请在平台页面完成验证后重试。',
+        'unavailable': '抖音作品已删除、下架或不可访问，请检查作品链接。',
+        'login': '抖音页面明确要求登录后观看，请在平台登录中更新登录态。',
+    }
+    try:
+        for attempt in range(1, attempts + 1):
+            details.clear()
+            state.clear()
+            reason, gate = '', None
+            stage = '打开作品页面'
+            try:
+                response = page.goto(current_url, wait_until='domcontentloaded', timeout=30000)
+                if response is not None:
+                    state['page'] = f'页面 HTTP {response.status}'
+                    if response.status in (404, 410):
+                        gate = 'unavailable'
+                    elif response.status >= 400:
+                        reason = state['page']
+                        stage = '读取错误页面状态'
+                        gate = _douyin_gate(page)
+                if not reason and not gate:
+                    stage = '等待分享链接跳转'
+                    page.wait_for_url(re.compile(r'https://(?:www\.)?douyin\.com/(video|note)/\d+'), timeout=10000)
+                    match = re.search(r'/(?:video|note)/(\d+)', page.url)
+                    if not match:
+                        reason = '分享链接未跳转到作品页面'
+                    else:
+                        ident = match[1]
+                        current_url = 'https://www.douyin.com/' + match[0].lstrip('/')
+                        deadline = time.monotonic() + wait_seconds
+                        stage = '读取作品数据与页面状态'
+                        while True:
+                            item = details.get(ident)
+                            if item:
+                                if item.get('images') or media_candidates(item.get('video') or {}, 'douyin'):
+                                    print(f'[解析] 第 {attempt}/{attempts} 次解析成功（作品 ID {ident}）。', flush=True)
+                                    return ident, item
+                                reason = '作品数据缺少可用媒体地址'
+                                break
+                            gate = _douyin_gate(page)
+                            if gate or state.get('retry_http') or time.monotonic() >= deadline:
+                                break
+                            page.wait_for_timeout(400)
+                        if not gate and not reason:
+                            reason = state.get('detail', f'等待 {wait_seconds} 秒，详情接口未响应')
+                            if details:
+                                reason += '，返回的作品 ID 与目标不匹配'
+            except BrowserError as exc:
+                reason = stage + '：' + _network_reason(exc)
+                # Redirects to a login/verification page may also time out wait_for_url.
+                try:
+                    gate = _douyin_gate(page)
+                except BrowserError:
+                    pass
+            if gate:
+                reason = terminal.get(gate, '作品页面暂不可访问')
+            summary = '；'.join(dict.fromkeys(x for x in (state.get('page'), state.get('detail'), reason) if x))
+            print(f'[诊断] 抖音解析 {attempt}/{attempts}，作品 ID {ident or "未知"}：{summary}', flush=True)
+            if gate:
+                raise RuntimeError(reason)
+            if attempt == attempts:
+                raise RuntimeError(f'抖音解析已尝试 {attempts} 次仍失败：{reason}。请稍后重试，具体原因见上方诊断日志。')
+            delay = state.get('delay', 2 ** attempt)
+            print(f'[重试] {delay} 秒后自动重新解析（第 {attempt + 1}/{attempts} 次），沿用当前登录态。', flush=True)
+            page.wait_for_timeout(delay * 1000)
+    finally:
+        context.remove_listener('response', observe)
+        context.remove_listener('requestfailed', failed)
+
 
 def media_candidates(video, platform):
     result=[]
@@ -56,32 +213,16 @@ def run(args, playwright, browser_exe, data, output, root, cookies):
     meta=json.loads(meta_path.read_text(encoding='utf-8')) if meta_path.exists() else {}
     if meta.get('source')=='import' or not context.cookies():
         context.add_cookies(cookies)
-    details={}
-    def observe(response):
-        try:
-            parsed=urllib.parse.urlsplit(response.url)
-            if platform=='douyin' and parsed.hostname=='www.douyin.com' and parsed.path=='/aweme/v1/web/aweme/detail/':
-                body=response.json().get('aweme_detail')
-                if body and body.get('aweme_id'):details[str(body['aweme_id'])]=body
-        except Exception:pass
-    context.on('response',observe)
     try:
         page=context.pages[0] if context.pages else context.new_page()
         print('[解析] 正在使用本机登录态打开作品页面…',flush=True)
-        page.goto(args.url,wait_until='domcontentloaded',timeout=60000)
         if platform=='douyin':
-            page.wait_for_url(re.compile(r'https://[^/]*douyin.com/(video|note)/\d+'),timeout=20000)
-            match=re.search(r'/(?:video|note)/(\d+)',page.url)
-            ident=match[1]
-            deadline=time.monotonic()+20
-            while ident not in details and time.monotonic()<deadline:
-                page.wait_for_timeout(400)
-            item=details.get(ident)
-            if not item:raise RuntimeError('作品页面未返回媒体信息。请确认作品可播放，或重新登录后重试。')
+            ident,item=parse_douyin(page,context,args.url)
             title=item.get('desc') or ident
             images=item.get('images') or []
             video=item.get('video') or {}
         else:
+            page.goto(args.url,wait_until='domcontentloaded',timeout=60000)
             deadline=time.monotonic()+20;item=None;ident=''
             while time.monotonic()<deadline:
                 if '/404' in page.url:raise RuntimeError('小红书链接已失效或缺少分享参数，请重新复制完整分享链接。')
