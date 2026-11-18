@@ -6,11 +6,11 @@
 
 Windows 本地视频与图文下载工具。粘贴链接或分享文案，在本地视频库搜索、播放和管理；支持多个下载任务并保留各平台独立登录资料。
 
-**0.3.4** 新增微信视频号动态抓取：先点击抓取，再播放微信视频号的视频；在右侧选择封面，左侧下载。界面采用暖灰与陶土橙，左栏仅保留操作和状态。[使用方式与兼容边界](docs/WECHAT-SOURCE.md)。
+**0.3.6** 改进抖音解析：失败后最多自动重试两次，沿用登录态并记录具体原因；普通解析失败不再笼统要求重新登录。本版同时提供平台标识、网站搜索及 Instagram 独立登录与分类。
 
 [下载最新版](https://github.com/zhizhiniao/FrameFlow/releases/latest) · [自动更新说明](docs/AUTO-UPDATE.md) · [反馈问题](https://github.com/zhizhiniao/FrameFlow/issues)
 
-本机 **0.3.5 预览**：底部常用平台 Logo、可搜索的网站名单、Instagram 独立登录与分类。Instagram 公开 Reel、MP4 直链和 M3U8 已下载并完整解码验证；[平台范围与限制](docs/PLATFORMS.md)。GitHub 正式版仍为 0.3.4。
+微信视频号继续支持动态抓取、封面确认及本地保存。[使用方式](docs/WECHAT-SOURCE.md) · [验证记录](docs/STATUS.md) · [平台范围与限制](docs/PLATFORMS.md)。
 
 ## 开始使用
 
